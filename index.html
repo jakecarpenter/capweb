@@ -10,11 +10,18 @@
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <link href='http://fonts.googleapis.com/css?family=Lato:400,900' rel='stylesheet' type='text/css'>
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/css/bootswatch.css" rel="stylesheet">
 
     <style type="text/css">
+
+      .well {
+        background-color: #eeeeee;
+        border: solid #dddddd 1px;
+        margin-bottom: 8px;
+      }
       .card {
         background-color: #eeeeee;
         border: solid #dddddd 1px;
@@ -98,8 +105,14 @@
       }
 
       .navbar-inner {
-        background-image: linear-gradient(to bottom,#1b7e5a,#156447);
+        background-image: linear-gradient(to bottom,#1b7e5a,#1b7e5a);
         background-repeat: repeat-x;
+      }
+
+      .navbar .brand {
+        font-family: 'Lato', sans-serif;
+        font-weight: 800;
+        font-size: 30px;
       }
       
 
@@ -121,7 +134,7 @@
          <span class="icon-bar"></span>
          <span class="icon-bar"></span>
        </a>
-       <a class="brand" href="../">Capture</a>
+       <a class=" brand" href="../">CAPTURE</a>
        <div class="nav-collapse collapse" id="main-menu">
         <ul class="nav" id="main-menu-left">
           <li><form class="navbar-search pull-left" action="">
@@ -173,14 +186,14 @@
 
         &nbsp;&nbsp;
 
-        Show: &nbsp;
+        Jump To: &nbsp;
           <div class="btn-group">
-            <a class="btn" href="#">Everything</a>
+            <a class="btn" href="#">Start</a>
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
             <ul class="dropdown-menu">
-              <li><a href="#">Photos</a></li>
-              <li><a href="#">Videos</a></li>
-              <li><a href="#">Text</a></li>
+              <li><a href="#">9:00</a></li>
+              <li><a href="#">11:00</a></li>
+              <li><a href="#">11:30</a></li>
             </ul>
           </div><!-- /btn-group -->
 
@@ -407,14 +420,13 @@
                             { 'user' :
                               { '$select': 
                                 { 'query': 
-                                  { 'Photo' :
+                                  { 'className' : "Photo",
+                                    "where": 
                                     {
-                                    '__type':'Pointer',
-                                    'className':'Event',
-                                    'objectId':  event 
+                                    'event':  event 
                                     }                                 
                                   },
-                                  key: "Photo"
+                                  key: "user"
                                 }
                               }
                             }
