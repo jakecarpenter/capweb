@@ -404,20 +404,23 @@
            fetchUsers : function(event){
             var params = {
                           'where':
-                            { 'User' :
-                              { '$inQuery': 
-                                { 'where': 
+                            { 'user' :
+                              { '$select': 
+                                { 'query': 
                                   { 'Photo' :
                                     {
                                     '__type':'Pointer',
                                     'className':'Event',
                                     'objectId':  event 
                                     }                                 
-                                  }
+                                  },
+                                  key: "Photo"
                                 }
                               }
                             }
                           };
+
+
 
              $.ajax({
                 beforeSend : buildHeader,
