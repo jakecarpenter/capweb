@@ -323,83 +323,129 @@
         //
         //
 
-
-          Parse.initialize("JfuHcRkELk91tbejwxCllYPRyauk3s4jCnTKQjah", "sEbSGmxNW4TP7v02J4XjgbsQioBRvlfr3JSoIC3Z");
-
-          // Photo Model
-          // -----------
-          
-
-          var Photo = Parse.Object.extend("Photo", {
-            photoURL: function() {
-              return "#pic/" + this.id;
-            },
-            photoImageURL: function() {
-              return this.get("image").url.replace(/http:\/\//,"https://s3.amazonaws.com/");
-            },
-            avatarImageURL: function() {
-              if (this.get("user").get("profilePictureMedium")) {
-                return this.get("user").get("profilePictureMedium").url.replace(/http:\/\//,"https://s3.amazonaws.com/");
-              }
-          
-              return "";
-            },
-            displayName: function() {
-              return this.get("user").get("displayName");
-            }
-          });
-          
-
-          // Photo Collection
-          // ----------------
-          
-          var PhotoList = Parse.Collection.extend({
-            model: Photo
-          });
-
-
-          // Event Model
-          // -----------
-
-          var Event = Parse.Object.extend("Event",{
-            eventURL: function() {
-              return "#event/" + this.id;
-            },
-            eventName: function() {
-              return this.displayName;
-            },
-            eventCreator: function() {
-              return this.get("createdBy").get("displayName");
-            },
-            eventLocation: function() {
-              return this.location;
-            },
-            eventPhotoURL: function() {
-              return "http://placekitten.com/300/300";
-            }
-          });
-
-          // Event Collection
-          // ----------------
-
-          var EventList = Parse.Collection.extend({
-            model: Event
-          });
-
-          var myEvents = new EventList();
-
-          myEvents.query = new Parse.Query(Photo);
-
-          myEvents.query.find({
-            success: function(object){
-              console.log(object);
-            },
-            error: function(object){
-              console.log(object);
-            }
-          });
-
      });
+
+      var capture = (function(){
+
+        //the events 
+        var events = [];
+
+        //the cards
+        var cards = {};
+
+        //the users for this event
+        var users = {};
+
+        //parse app key
+        var parseAppId = 'JfuHcRkELk91tbejwxCllYPRyauk3s4jCnTKQjah';
+
+        //parse rest key
+        var parseRestKey = 'LO8kGXmk83QlC2vQI1QGcEkt3cNDeIC2RHNogfpn';
+
+        //parse server
+        var parseServer = 'api.parse.com';
+
+        //put it together 
+        var parseHost = "https://" +  parseServer;
+
+        //some error handling 
+        var requestError = function(error){
+          console.log(error);
+          //return error;
+        };
+
+        // stuff for the header building
+        var buildHeader = function(xhr) {
+          xhr.setRequestHeader("X-Parse-Application-Id", parseAppId);
+          xhr.setRequestHeader("X-Parse-REST-API-Key", parseRestKey);
+        };
+
+
+        return {
+          fetchEvents : function(){
+            console.log(parseHost);
+            $.ajax({
+                beforeSend : buildHeader,
+                type: 'get',
+                url: parseHost + '/1/classes/Event',
+                success: function(data){
+                  events = [];
+                  $.each(data.results, function(item){
+                    events.push(data.results[item]);
+                  })
+                },
+                error: requestError,
+              });
+          },
+          fetchCards : function(event){
+            var params = {
+                            'where':{ 'event':
+                              { '__type':'Pointer',
+                              'className':'Event',
+                              'objectId':  event 
+                            }}
+                          };
+
+             $.ajax({
+                beforeSend : buildHeader,
+                type: 'get',
+                url: parseHost + '/1/classes/Photo',
+                data: params,
+                success: function(data){
+                  $.each(data.results, function(item){
+                    if(!(data.results[item].objectId in cards)){
+                      cards[data.results[item].objectId] = data.results[item];
+                    }
+                  })
+                },
+                error: requestError,
+              });
+          },
+           fetchUsers : function(event){
+            var params = {
+                          'where':
+                            { 'User' :
+                              { '$inQuery': 
+                                { 'where': 
+                                  { 'Photo' :
+                                    {
+                                    '__type':'Pointer',
+                                    'className':'Event',
+                                    'objectId':  event 
+                                    }                                 
+                                  }
+                                }
+                              }
+                            }
+                          };
+
+             $.ajax({
+                beforeSend : buildHeader,
+                type: 'get',
+                url: parseHost + '/1/classes/User',
+                data: params,
+                success: function(data){
+                  $.each(data.results, function(item){
+                    if(!(data.results[item].objectId in users)){
+                      users[data.results[item].objectId] = data.results[item];
+                    }
+                  })
+                },
+                error: requestError,
+              });
+          },
+          getEvents : function(){
+            return events;
+          },
+          getCards : function(){
+            return cards;
+          },
+          getUsers : function(){
+            return users;
+          }
+        };
+
+      })();
     </script>
 
   </body>
