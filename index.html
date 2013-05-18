@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -288,6 +287,7 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="assets/scripts/jquery.smooth-scroll.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://www.parsecdn.com/js/parse-1.2.3.min.js"></script>
 
 
     <script type="text/javascript">
@@ -306,26 +306,100 @@
         //init an array
         var content = [];
 
+        //make 100 dummy cards
         for (var i=0; i < 100; i++){
           content.push(cards[Math.floor(Math.random()*cards.length)]);
         }
-
-        console.log(content)
-
+        //put the dummy cards in the columns
         for(var i=0; i < content.length; i++){
-
           addCard(content[i] , (i%3) + 1);
         }
-
-        var colnum = cols.length;
 
         function addCard( item , el){
           $("#card-col-"+ el).append($(item).clone());
         }
 
-        //$("#card-col-3").html($("#card-col-1").html());
-        //$("#card-col-2").html($("#card-col-1").html());
-      });
+        //the following is parse stuff. will eventually move to a new place
+        //
+        //
+
+
+          Parse.initialize("JfuHcRkELk91tbejwxCllYPRyauk3s4jCnTKQjah", "sEbSGmxNW4TP7v02J4XjgbsQioBRvlfr3JSoIC3Z");
+
+          // Photo Model
+          // -----------
+          
+
+          var Photo = Parse.Object.extend("Photo", {
+            photoURL: function() {
+              return "#pic/" + this.id;
+            },
+            photoImageURL: function() {
+              return this.get("image").url.replace(/http:\/\//,"https://s3.amazonaws.com/");
+            },
+            avatarImageURL: function() {
+              if (this.get("user").get("profilePictureMedium")) {
+                return this.get("user").get("profilePictureMedium").url.replace(/http:\/\//,"https://s3.amazonaws.com/");
+              }
+          
+              return "";
+            },
+            displayName: function() {
+              return this.get("user").get("displayName");
+            }
+          });
+          
+
+          // Photo Collection
+          // ----------------
+          
+          var PhotoList = Parse.Collection.extend({
+            model: Photo
+          });
+
+
+          // Event Model
+          // -----------
+
+          var Event = Parse.Object.extend("Event",{
+            eventURL: function() {
+              return "#event/" + this.id;
+            },
+            eventName: function() {
+              return this.displayName;
+            },
+            eventCreator: function() {
+              return this.get("createdBy").get("displayName");
+            },
+            eventLocation: function() {
+              return this.location;
+            },
+            eventPhotoURL: function() {
+              return "http://placekitten.com/300/300";
+            }
+          });
+
+          // Event Collection
+          // ----------------
+
+          var EventList = Parse.Collection.extend({
+            model: Event
+          });
+
+          var myEvents = new EventList();
+
+          myEvents.query = new Parse.Query(Photo);
+
+          myEvents.query.find({
+            success: function(object){
+              console.log(object);
+            },
+            error: function(object){
+              console.log(object);
+            }
+          });
+
+     });
     </script>
 
   </body>
