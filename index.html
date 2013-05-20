@@ -314,6 +314,7 @@
 
     <script type="text/javascript">
       $(document).ready(function() {
+
         //grab the sample cards
         var cards = $("#cards").children().children().children();
 
@@ -325,28 +326,22 @@
           $(value).html("");
         });
 
-        //init an array
-        var content = [];
+        // //init an array
+        // var content = [];
 
-        //make 100 dummy cards
-        for (var i=0; i < 100; i++){
-          content.push(cards[Math.floor(Math.random()*cards.length)]);
-        }
-        //put the dummy cards in the columns
-        for(var i=0; i < content.length; i++){
-          addCard(content[i] , (i%3) + 1);
-        }
+        // //make 100 dummy cards
+        // for (var i=0; i < 100; i++){
+        //   content.push(cards[Math.floor(Math.random()*cards.length)]);
+        // }
+        // //put the dummy cards in the columns
+        // for(var i=0; i < content.length; i++){
+        //   addCard(content[i] , (i%3) + 1);
+        // }
 
-        function addCard( item , el){
-          $("#card-col-"+ el).append($(item).clone());
-        }
+        // function addCard( item , el){
+        //   $("#card-col-"+ el).append($(item).clone());
+        // }
 
-        capture.fetchEvents();
-
-        //finally, setup interface events.
-        $('#events-menu').on('click','a',function(el) {
-         capture.setEvent(el.target.dataset.captureEventId);
-        });
 
      });
 
@@ -437,6 +432,18 @@
           xhr.setRequestHeader("X-Parse-Application-Id", parseAppId);
           xhr.setRequestHeader("X-Parse-REST-API-Key", parseRestKey);
         };
+        //
+        var updateView = function(){
+
+            $.each(cards, function(key){
+              try{
+                addCard(cards[key]);
+              }
+              catch(e){
+
+              }
+            })
+          }
 
         //grab the user info
         var fetchAuthor = function(userId){
@@ -459,12 +466,54 @@
               });
           };
 
-          var fetchCards = function(event){
-            var params = {
+          var newCards = function(data){
+            //go through the results and add any that are new
+            $.each(data.results, function(item){
+              if(!(data.results[item].objectId in cards)){
+                fetchAuthor(data.results[item].user.objectId);
+                cards[data.results[item].objectId] = data.results[item];
+              }
+            });
+            updateView();
+          }
+
+        //EVENT HANDLERS
+
+        //fsetup interface events.
+        $('#events-menu').on('click','a',function(el) {
+         activeEvent = el.target.dataset.captureEventId;
+        });
+
+        //setup a handler for url hashtag changes
+        $(window).bind( "hashchange", hashChangeHandler);
+
+        var hashChangeHandler = function(hashEvent) {
+          var hash = window.location.hash.split("/");
+          var hashData = hash[1];
+          var hashCommand = hash[0].split("#")[1];
+
+          switch(hashCommand){
+            case "event":
+              activeEvent = hashData;
+
+              break;
+            case "card":
+
+              break;
+
+          }
+        }
+
+        //run the hash handler once to check current url
+        hashChangeHandler();
+
+        //setup our polling
+        var pollo = (function poll(){
+          var params = {
                             'where':{ 'event':
                               { '__type':'Pointer',
                               'className':'Event',
-                              'objectId':  event 
+                              'objectId':  activeEvent
                             }}
                           };
 
@@ -473,25 +522,16 @@
                 type: 'get',
                 url: parseHost + '/1/classes/Photo',
                 data: params,
-                success: function(data){
-                  //go through the results and add any that are new
-                  $.each(data.results, function(item){
-                    if(!(data.results[item].objectId in cards)){
-                      fetchAuthor(data.results[item].user.objectId);
-                      cards[data.results[item].objectId] = data.results[item];
-                    }
-                  });
-                },
+                success: newCards,
                 error: requestError,
+                complete: function(){
+                  setTimeout(poll, 4000);
+                }, 
+                
               });
-          };
+        })();  
 
-
-        return {
-          setEvent: function(event){
-            this.activeEvent = event;
-          },
-          fetchEvents : function(){
+        var fetchEvents = function(){
             $.ajax({
                 beforeSend : buildHeader,
                 type: 'get',
@@ -507,25 +547,9 @@
                 },
                 error: requestError,
               });
-            //maybe not the best spot
-            return events;
-          },
-          updateData : function(){
-            fetchCards(this.activeEvent);
-          },
-          updateView : function(){
-
-            $.each(cards, function(key){
-              try{
-                addCard(cards[key]);
-              }
-              catch(e){
-
-              }
-            })
           }
-        };
 
+        fetchEvents();
       })();
     </script>
 
