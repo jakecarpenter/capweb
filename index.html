@@ -45,6 +45,8 @@
         .source-thumb {
           float: left;        
           margin: 4px 3px 3px 12px;
+          width: 40px;
+          height: 40px;
         }
 
       .image-card {
@@ -55,6 +57,8 @@
 
         .image-card-image {
           margin: 15px 15px 15px 15px;
+          width: 256px;
+          height: 256px;
         }
 
         .card h6 {
@@ -105,7 +109,7 @@
       }
 
       .navbar-inner {
-        background-image: linear-gradient(to bottom,#1b7e5a,#1b7e5a);
+        background-image: linear-gradient(to bottom,#FDA933,#ec9822);
         background-repeat: repeat-x;
       }
 
@@ -142,7 +146,12 @@
           </form></li>
         </ul>
         <ul class="nav pull-right" id="main-menu-right">
-          <li></li>
+          <li class="dropdown" id="events-menu-container" style="display:none;">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Events <b class="caret"></b></a>
+            <ul class="dropdown-menu" id="events-menu">
+            </ul>
+          </li>
+
         </ul>
        </div>
      </div>
@@ -213,6 +222,7 @@
   <div  class="row">
 
     <div id="card-col-1" class="span4">
+
       <div class="card image-card">
         <img src="http://placekitten.com/256/256" class="img-polaroid image-card-image">
         <h6>Caption of a kitten... Kiption?</h6>
@@ -300,7 +310,6 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="assets/scripts/jquery.smooth-scroll.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://www.parsecdn.com/js/parse-1.2.3.min.js"></script>
 
 
     <script type="text/javascript">
@@ -332,13 +341,19 @@
           $("#card-col-"+ el).append($(item).clone());
         }
 
-        //the following is parse stuff. will eventually move to a new place
-        //
-        //
+        capture.fetchEvents();
+
+        //finally, setup interface events.
+        $('#events-menu').on('click','a',function(el) {
+         capture.setEvent(el.target.dataset.captureEventId);
+        });
 
      });
 
       var capture = (function(){
+
+        //what are we looking at?
+        var activeEvent;
 
         //the events 
         var events = [];
@@ -347,7 +362,7 @@
         var cards = {};
 
         //the users for this event
-        var users = {};
+        var authors = {};
 
         //parse app key
         var parseAppId = 'JfuHcRkELk91tbejwxCllYPRyauk3s4jCnTKQjah';
@@ -361,6 +376,56 @@
         //put it together 
         var parseHost = "https://" +  parseServer;
 
+        //number of card columns
+        var numCardCol = 3;
+
+        window.numCardCol = numCardCol;
+        window.currentCardCol = 1;
+
+        //update the events list
+        var updateEventsList = function () {
+          $.each(events, function(key){
+            console.log(events[key]);
+            var item = '<li><a data-capture-event-id="'+ events[key].objectId +'">' + events[key].fullName + '</a></li>';
+            $("#events-menu").append(item);
+            $("#events-menu-container").show();
+          });
+        }
+
+        //add a card to the current card list. 
+        var addCard = function(card){
+          //make sure this card isn't already there.
+          if($("div[data-capture-card-id='"+ card.objectId +"']").length > 0){
+            return;
+          }
+
+          //get our user
+          var user = authors[card.user.objectId];
+          console.log(card.user.objectId);
+          //find the type of card
+          if(card.type == "capture"){
+                      var cardHTML = ' <div class="card image-card" '+
+                      'data-capture-type="'+ card.type +
+                      '" data-capture-user="' + user.objectId +
+                      '" data-capture-card-id="' + card.objectId + '"> '+
+                         ' <img src="' + card.image.url + '" class="img-polaroid image-card-image">'+
+                          '<h6>' + card.caption + '</h6>'+
+                          
+                          '<div class="card-author">'+
+                              '<img class="source-thumb" src="' + user.profilePictureMedium.url + '" />'+
+                              '<span class="source-name">'+ user.displayName +'</span><br>'+
+                              '<span class="source-service">Capture<span>'+
+                          '</div>'+
+
+                        '</div>';
+          }
+
+
+           $("#card-col-"+ window.currentCardCol).prepend(cardHTML);
+           window.currentCardCol = (window.currentCardCol < window.numCardCol)? window.currentCardCol + 1 : 1;
+          
+        };
+
         //some error handling 
         var requestError = function(error){
           console.log(error);
@@ -373,24 +438,28 @@
           xhr.setRequestHeader("X-Parse-REST-API-Key", parseRestKey);
         };
 
+        //grab the user info
+        var fetchAuthor = function(userId){
 
-        return {
-          fetchEvents : function(){
-            console.log(parseHost);
-            $.ajax({
+            var params = {
+                            'where':{ 
+                              'objectId':  userId
+                            }
+                          };
+
+             $.ajax({
                 beforeSend : buildHeader,
                 type: 'get',
-                url: parseHost + '/1/classes/Event',
+                url: parseHost + '/1/users',
+                data: params,
                 success: function(data){
-                  events = [];
-                  $.each(data.results, function(item){
-                    events.push(data.results[item]);
-                  })
+                  authors[data.results[0].objectId] = data.results[0];
                 },
                 error: requestError,
               });
-          },
-          fetchCards : function(event){
+          };
+
+          var fetchCards = function(event){
             var params = {
                             'where':{ 'event':
                               { '__type':'Pointer',
@@ -405,58 +474,55 @@
                 url: parseHost + '/1/classes/Photo',
                 data: params,
                 success: function(data){
+                  //go through the results and add any that are new
                   $.each(data.results, function(item){
                     if(!(data.results[item].objectId in cards)){
+                      fetchAuthor(data.results[item].user.objectId);
                       cards[data.results[item].objectId] = data.results[item];
                     }
-                  })
+                  });
                 },
                 error: requestError,
               });
+          };
+
+
+        return {
+          setEvent: function(event){
+            this.activeEvent = event;
           },
-           fetchUsers : function(event){
-            var params = {
-                          'where':
-                            { 'user' :
-                              { '$select': 
-                                { 'query': 
-                                  { 'className' : "Photo",
-                                    "where": 
-                                    {
-                                    'event':  event 
-                                    }                                 
-                                  },
-                                  key: "user"
-                                }
-                              }
-                            }
-                          };
-
-
-
-             $.ajax({
+          fetchEvents : function(){
+            $.ajax({
                 beforeSend : buildHeader,
                 type: 'get',
-                url: parseHost + '/1/classes/User',
-                data: params,
+                url: parseHost + '/1/classes/Event',
                 success: function(data){
+                  events = [];
                   $.each(data.results, function(item){
-                    if(!(data.results[item].objectId in users)){
-                      users[data.results[item].objectId] = data.results[item];
-                    }
+                    events.push(data.results[item]);
                   })
+                },
+                complete: function(){
+                  updateEventsList();
                 },
                 error: requestError,
               });
-          },
-          getEvents : function(){
+            //maybe not the best spot
             return events;
           },
-          getCards : function(){
-            return cards;
+          updateData : function(){
+            fetchCards(this.activeEvent);
           },
-          getUsers : function(){
-            return users;
+          updateView : function(){
+
+            $.each(cards, function(key){
+              try{
+                addCard(cards[key]);
+              }
+              catch(e){
+
+              }
+            })
           }
         };
 
