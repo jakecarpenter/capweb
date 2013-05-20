@@ -396,7 +396,6 @@
 
           //get our user
           var user = authors[card.user.objectId];
-          console.log(card.user.objectId);
           //find the type of card
           if(card.type == "capture"){
                       var cardHTML = ' <div class="card image-card" '+
@@ -416,9 +415,21 @@
           }
 
 
+
            $("#card-col-"+ window.currentCardCol).prepend(cardHTML);
            window.currentCardCol = (window.currentCardCol < window.numCardCol)? window.currentCardCol + 1 : 1;
           
+        };
+
+
+        var emptyColumns = function(){
+          $.each($('[id^=card-col-]'), function(item, el){  
+            $(el).html('');
+            cards = {};
+          });
+
+          //reset the counter
+          window.currentCardCol = 1;
         };
 
         //some error handling 
@@ -481,12 +492,13 @@
 
         //fsetup interface events.
         $('#events-menu').on('click','a',function(el) {
-         activeEvent = el.target.dataset.captureEventId;
+         changeEventHandler(el.target.dataset.captureEventId);
         });
 
         //setup a handler for url hashtag changes
         $(window).bind( "hashchange", hashChangeHandler);
 
+        //handler functions
         var hashChangeHandler = function(hashEvent) {
           var hash = window.location.hash.split("/");
           var hashData = hash[1];
@@ -494,7 +506,7 @@
 
           switch(hashCommand){
             case "event":
-              activeEvent = hashData;
+              changeEventHandler(hashData);
 
               break;
             case "card":
@@ -502,19 +514,27 @@
               break;
 
           }
-        }
+        };
+
+        var changeEventHandler = function(event){
+          window.location.hash = "#event/" + event;
+          cards = {};
+          activeEvent = event;
+          emptyColumns();
+        };
+
 
         //run the hash handler once to check current url
         hashChangeHandler();
 
         //setup our polling
-        var pollo = (function poll(){
+        (function poll(){
           var params = {
                             'where':{ 'event':
                               { '__type':'Pointer',
                               'className':'Event',
                               'objectId':  activeEvent
-                            }}
+                            }}, "order":"createdAt"
                           };
 
              $.ajax({
