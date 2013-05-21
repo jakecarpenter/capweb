@@ -111,6 +111,7 @@
       .navbar-inner {
         background-image: linear-gradient(to bottom,#FDA933,#ec9822);
         background-repeat: repeat-x;
+        border-bottom: none;
       }
 
       .navbar .brand {
@@ -160,131 +161,10 @@
 
 <div class="container">
 
+  <div id="app-container"><!-- start app container -->
 
 
-<section id="controls">
-
-  <div class="row">
-    <div class="span12">
-      <div class="well">
-
-        <a class="btn" href="#">Pause</a>&nbsp;&nbsp;
-
-        Order By: &nbsp;
-          <div class="btn-group">
-            <a class="btn" href="#">Date & Time</a>
-            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-            <ul class="dropdown-menu">
-              <li><a href="#">Popularity</a></li>
-              <li><a href="#">Contributor</a></li>
-              <li><a href="#">Source</a></li>
-            </ul>
-          </div><!-- /btn-group -->
-          &nbsp;&nbsp;
-
-        Show: &nbsp;
-          <div class="btn-group">
-            <a class="btn" href="#">Everything</a>
-            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-            <ul class="dropdown-menu">
-              <li><a href="#">Photos</a></li>
-              <li><a href="#">Videos</a></li>
-              <li><a href="#">Text</a></li>
-            </ul>
-          </div><!-- /btn-group -->
-
-        &nbsp;&nbsp;
-
-        Jump To: &nbsp;
-          <div class="btn-group">
-            <a class="btn" href="#">Start</a>
-            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
-            <ul class="dropdown-menu">
-              <li><a href="#">9:00</a></li>
-              <li><a href="#">11:00</a></li>
-              <li><a href="#">11:30</a></li>
-            </ul>
-          </div><!-- /btn-group -->
-
-          &nbsp;&nbsp;
-
-          <a class="btn" href="#">Share...</a>&nbsp;&nbsp;
-
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="cards">
-
-
-  <!-- cards -->
-  <div  class="row">
-
-    <div id="card-col-1" class="span4">
-
-      <div class="card image-card">
-        <img src="http://placekitten.com/256/256" class="img-polaroid image-card-image">
-        <h6>Caption of a kitten... Kiption?</h6>
-        
-        <div class="card-author">
-            <img class="source-thumb" src="http://placekitten.com/40/40" />
-            <span class="source-name">Test Testerson</span><br>
-            <span class="source-service">Capture<span>
-        </div>
-
-      </div>
-
-      <div class="card twitter-card">
-        <p class= "twitter-card-tweet">This is a super cool tweet!! Aren't I worth a retweet? It would totes raise your klout.</p>
-
-        
-        <div class="card-author">
-            <img class="source-thumb" src="http://placekitten.com/40/40" />
-            <span class="source-name">Test Testerson</span><br>
-            <span class="source-service">twitter<span>
-        </div>
-      </div>
-
-
-     <div class="card instagram-card">
-        <img src="http://placekitten.com/256/256" class="img-polaroid image-card-image">
-        <h6>Caption of a kitten... Kiption?</h6>
-        
-        <div class="card-author">
-            <img class="source-thumb" src="http://placekitten.com/40/40" />
-            <span class="source-name">Test Testerson</span><br>
-            <span class="source-service">instagram<span>
-        </div>
-
-      </div>
-
-      <div class="card facebook-card">
-        <p class= "facebook-card-status">Like Uhg. Just had the worst cornflakes. This place needs to up the standards or I'm moving out. Ya hear that ma?</p>
-
-        <div class="card-author">
-            <img class="source-thumb" src="http://placekitten.com/40/40" />
-            <span class="source-name">Test Testerson</span><br>
-            <span class="source-service">Facebook<span>
-        </div>
-      </div>
-    </div>
-
-  <div id="card-col-2" class="span4">
-
-  </div>
-
-  <div id="card-col-3" class="span4">
-
-  </div>
-
-</div>
-
-
-</section>
-
-
-<br><br><br><br>
+</div><!-- end app container-->
 
      <!-- Footer
       ================================================== -->
@@ -309,6 +189,7 @@
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="assets/scripts/jquery.smooth-scroll.min.js"></script>
+    <script src="assets/scripts/capture.js"></script>
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
 
 
@@ -326,252 +207,35 @@
           $(value).html("");
         });
 
-        // //init an array
-        // var content = [];
-
-        // //make 100 dummy cards
-        // for (var i=0; i < 100; i++){
-        //   content.push(cards[Math.floor(Math.random()*cards.length)]);
-        // }
-        // //put the dummy cards in the columns
-        // for(var i=0; i < content.length; i++){
-        //   addCard(content[i] , (i%3) + 1);
-        // }
-
-        // function addCard( item , el){
-        //   $("#card-col-"+ el).append($(item).clone());
-        // }
 
 
      });
-
-      var capture = (function(){
-
-        //what are we looking at?
-        var activeEvent;
-
-        //the events 
-        var events = [];
-
-        //the cards
-        var cards = {};
-
-        //the users for this event
-        var authors = {};
-
-        //parse app key
-        var parseAppId = 'JfuHcRkELk91tbejwxCllYPRyauk3s4jCnTKQjah';
-
-        //parse rest key
-        var parseRestKey = 'LO8kGXmk83QlC2vQI1QGcEkt3cNDeIC2RHNogfpn';
-
-        //parse server
-        var parseServer = 'api.parse.com';
-
-        //put it together 
-        var parseHost = "https://" +  parseServer;
-
-        //number of card columns
-        var numCardCol = 3;
-
-        window.numCardCol = numCardCol;
-        window.currentCardCol = 1;
-
-        //update the events list
-        var updateEventsList = function () {
-          $.each(events, function(key){
-            console.log(events[key]);
-            var item = '<li><a data-capture-event-id="'+ events[key].objectId +'">' + events[key].fullName + '</a></li>';
-            $("#events-menu").append(item);
-            $("#events-menu-container").show();
-          });
-        }
-
-        //add a card to the current card list. 
-        var addCard = function(card){
-          //make sure this card isn't already there.
-          if($("div[data-capture-card-id='"+ card.objectId +"']").length > 0){
-            return;
-          }
-
-          //get our user
-          var user = authors[card.user.objectId];
-          //find the type of card
-          if(card.type == "capture"){
-                      var cardHTML = ' <div class="card image-card" '+
-                      'data-capture-type="'+ card.type +
-                      '" data-capture-user="' + user.objectId +
-                      '" data-capture-card-id="' + card.objectId + '"> '+
-                         ' <img src="' + card.image.url + '" class="img-polaroid image-card-image">'+
-                          '<h6>' + card.caption + '</h6>'+
-                          
-                          '<div class="card-author">'+
-                              '<img class="source-thumb" src="' + user.profilePictureMedium.url + '" />'+
-                              '<span class="source-name">'+ user.displayName +'</span><br>'+
-                              '<span class="source-service">Capture<span>'+
-                          '</div>'+
-
-                        '</div>';
-          }
-
-
-
-           $("#card-col-"+ window.currentCardCol).prepend(cardHTML);
-           window.currentCardCol = (window.currentCardCol < window.numCardCol)? window.currentCardCol + 1 : 1;
-          
-        };
-
-
-        var emptyColumns = function(){
-          $.each($('[id^=card-col-]'), function(item, el){  
-            $(el).html('');
-            cards = {};
-          });
-
-          //reset the counter
-          window.currentCardCol = 1;
-        };
-
-        //some error handling 
-        var requestError = function(error){
-          console.log(error);
-          //return error;
-        };
-
-        // stuff for the header building
-        var buildHeader = function(xhr) {
-          xhr.setRequestHeader("X-Parse-Application-Id", parseAppId);
-          xhr.setRequestHeader("X-Parse-REST-API-Key", parseRestKey);
-        };
-        //
-        var updateView = function(){
-
-            $.each(cards, function(key){
-              try{
-                addCard(cards[key]);
-              }
-              catch(e){
-
-              }
-            })
-          }
-
-        //grab the user info
-        var fetchAuthor = function(userId){
-
-            var params = {
-                            'where':{ 
-                              'objectId':  userId
-                            }
-                          };
-
-             $.ajax({
-                beforeSend : buildHeader,
-                type: 'get',
-                url: parseHost + '/1/users',
-                data: params,
-                success: function(data){
-                  authors[data.results[0].objectId] = data.results[0];
-                },
-                error: requestError,
-              });
-          };
-
-          var newCards = function(data){
-            //go through the results and add any that are new
-            $.each(data.results, function(item){
-              if(!(data.results[item].objectId in cards)){
-                fetchAuthor(data.results[item].user.objectId);
-                cards[data.results[item].objectId] = data.results[item];
-              }
-            });
-            updateView();
-          }
-
-        //EVENT HANDLERS
-
-        //fsetup interface events.
-        $('#events-menu').on('click','a',function(el) {
-         changeEventHandler(el.target.dataset.captureEventId);
-        });
-
-        //setup a handler for url hashtag changes
-        $(window).bind( "hashchange", hashChangeHandler);
-
-        //handler functions
-        var hashChangeHandler = function(hashEvent) {
-          var hash = window.location.hash.split("/");
-          var hashData = hash[1];
-          var hashCommand = hash[0].split("#")[1];
-
-          switch(hashCommand){
-            case "event":
-              changeEventHandler(hashData);
-
-              break;
-            case "card":
-
-              break;
-
-          }
-        };
-
-        var changeEventHandler = function(event){
-          window.location.hash = "#event/" + event;
-          cards = {};
-          activeEvent = event;
-          emptyColumns();
-        };
-
-
-        //run the hash handler once to check current url
-        hashChangeHandler();
-
-        //setup our polling
-        (function poll(){
-          var params = {
-                            'where':{ 'event':
-                              { '__type':'Pointer',
-                              'className':'Event',
-                              'objectId':  activeEvent
-                            }}, "order":"createdAt"
-                          };
-
-             $.ajax({
-                beforeSend : buildHeader,
-                type: 'get',
-                url: parseHost + '/1/classes/Photo',
-                data: params,
-                success: newCards,
-                error: requestError,
-                complete: function(){
-                  setTimeout(poll, 4000);
-                }, 
-                
-              });
-        })();  
-
-        var fetchEvents = function(){
-            $.ajax({
-                beforeSend : buildHeader,
-                type: 'get',
-                url: parseHost + '/1/classes/Event',
-                success: function(data){
-                  events = [];
-                  $.each(data.results, function(item){
-                    events.push(data.results[item]);
-                  })
-                },
-                complete: function(){
-                  updateEventsList();
-                },
-                error: requestError,
-              });
-          }
-
-        fetchEvents();
-      })();
     </script>
+
+    <script> //<!-- facebook stuff -->
+    // Additional JS functions here
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '519438568120137', // App ID
+        channelUrl : '//trycapture.com/channel.html', // Channel File
+        status     : true, // check login status
+        cookie     : true, // enable cookies to allow the server to access the session
+        xfbml      : true  // parse XFBML
+      });
+
+      // Additional init code here
+
+    };
+
+    // Load the SDK asynchronously
+    (function(d){
+       var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement('script'); js.id = id; js.async = true;
+       js.src = "//connect.facebook.net/en_US/all.js";
+       ref.parentNode.insertBefore(js, ref);
+     }(document));
+  </script>
 
   </body>
 </html>
