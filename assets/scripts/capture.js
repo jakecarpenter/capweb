@@ -100,7 +100,7 @@
           xhr.setRequestHeader("X-Parse-REST-API-Key", parseRestKey);
         };
         //
-        var updateView = function(){
+        var updateCardView = function(){
 
             $.each(cards, function(key){
               try{
@@ -133,6 +133,7 @@
               });
           };
 
+
           var newCards = function(data){
             //go through the results and add any that are new
             $.each(data.results, function(item){
@@ -141,7 +142,7 @@
                 cards[data.results[item].objectId] = data.results[item];
               }
             });
-            updateView();
+            updateCardView();
           }
 
         //EVENT HANDLERS
@@ -152,7 +153,7 @@
         });
 
         //setup a handler for url hashtag changes
-        $(window).bind( "hashchange", hashChangeHandler);
+        $(window).on( "hashchange", hashChangeHandler);
 
         //handler functions
         var hashChangeHandler = function(hashEvent) {
@@ -171,6 +172,9 @@
             case "user":
               userView(hashData);
               break;
+            case "login":
+              loginView(hashData);
+              break;
             default:
               welcomeView(hashData);
               break;
@@ -184,20 +188,49 @@
           cards = {};
           activeEvent = event;
           emptyColumns();
+          currentView = "event";
         };
 
         var cardView = function(card){
         	//load the html
+          currentView = "card";
           $('#app-container').load('pages/card.html');
         }
 
+        var loginView = function(){
+          //current view 
+          currentView = "login";
+
+          $('#app-container').load('pages/login.html');
+        }
+
         var userView = function(user){
-        	//load the html
-          $('#app-container').load('pages/user.html');
+        	//keep track of where we are
+          currentView = "user";
+
+          //get the user object. if not there, redirect to welcome controller.
+           var params = {
+                            'where':{ 
+                              'objectId':  user
+                            }
+                          };
+
+             $.ajax({
+                beforeSend : buildHeader,
+                type: 'get',
+                url: parseHost + '/1/users',
+                data: params,
+                success: function(data){
+                  $('#app-container').load('pages/user.html');
+                  console.log(data);
+                },
+                error: requestError,
+              });
         }
 
         var welcomeView = function(data){
         	//load the html
+          currentView = "welcome";
           $('#app-container').load('pages/welcome.html');
         }
 
@@ -208,7 +241,8 @@
 
         //setup our polling
         (function poll(){
-          var params = {
+
+              var params = {
                             'where':{ 'event':
                               { '__type':'Pointer',
                               'className':'Event',
@@ -228,6 +262,7 @@
                 }, 
                 
               });
+
         })();  
 
         var fetchEvents = function(){
