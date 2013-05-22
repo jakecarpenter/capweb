@@ -152,6 +152,12 @@
          eventView(el.target.dataset.captureEventId);
         });
 
+        //login form submit
+          $(document).on('submit', "#login-form", function(el) {
+            doLogin($("#login-email").val(), $("#login-password").val());
+            el.preventDefault();
+          });
+
         //setup a handler for url hashtag changes
         $(window).on( "hashchange", hashChangeHandler);
 
@@ -195,14 +201,14 @@
         	//load the html
           currentView = "card";
           $('#app-container').load('pages/card.html');
-        }
+        };
 
         var loginView = function(){
           //current view 
           currentView = "login";
 
           $('#app-container').load('pages/login.html');
-        }
+        };
 
         var userView = function(user){
         	//keep track of where we are
@@ -226,18 +232,38 @@
                 },
                 error: requestError,
               });
-        }
+        };
 
         var welcomeView = function(data){
         	//load the html
           currentView = "welcome";
           $('#app-container').load('pages/welcome.html');
-        }
+        };
 
 
 
         //run the hash handler once to check current url
         hashChangeHandler();
+
+        //view specific functions
+        var doLogin = function(user, password){
+           var params = { 'username':  user,
+                          'password': password };
+
+             $.ajax({
+                beforeSend : buildHeader,
+                type: 'get',
+                url: parseHost + '/1/login',
+                data: params,
+                success: function(data){
+                  console.log(data);
+                  $.cookie('capture-user', data.objectId);
+                  $.cookie('capture-session', data.sessionToken);
+
+                },
+                error: requestError,
+              });
+        };
 
         //setup our polling
         (function poll(){
