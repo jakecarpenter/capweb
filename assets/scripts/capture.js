@@ -127,7 +127,8 @@
                 url: parseHost + '/1/users',
                 data: params,
                 success: function(data){
-                  authors[data.results[0].objectId] = data.results[0];
+                    authors[data.results[0].objectId] = data.results[0];
+              
                 },
                 error: requestError,
               });
@@ -164,10 +165,11 @@
         //handler functions
         var hashChangeHandler = function(hashEvent) {
           var hash = window.location.hash.split("/");
-          var hashData = hash[1];
-          var hashCommand = hash[0].split("#")[1];
 
-          switch(hashCommand){
+          var hashData = hash[1];
+          var hashCommand = hash[2];
+
+          switch(hashCommand.trim()){
             case "event":
               eventView(hashData);
 
@@ -182,6 +184,7 @@
               loginView(hashData);
               break;
             default:
+              console.log(hashData);
               welcomeView(hashData);
               break;
           }
