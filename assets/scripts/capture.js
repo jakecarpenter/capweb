@@ -36,7 +36,7 @@
         //update the events list
         var updateEventsList = function () {
           $.each(events, function(key){
-            console.log(events[key]);
+
             var item = '<li><a data-capture-event-id="'+ events[key].objectId +'">' + events[key].fullName + '</a></li>';
             $("#events-menu").append(item);
             $("#events-menu-container").show();
@@ -52,15 +52,35 @@
 
           //get our user
           var user = authors[card.user.objectId];
+
+          //define our card
+          var cardHTML = '<div class="card">card error '+ card.objectId+'</div>';
           //find the type of card
-          if(card.type == "capture"){
-                      var cardHTML = ' <div class="card image-card" '+
-                      'data-capture-type="'+ card.type +
+          if(card.service == "capture"){
+                       cardHTML = ' <div class="card image-card" '+
+                      'data-capture-type="'+ card.service +
                       '" data-capture-user="' + user.objectId +
                       '" data-capture-card-id="' + card.objectId + '"> '+
                          ' <img src="' + card.image.url + '" class="img-polaroid image-card-image">'+
                           //'<h6>' + card.caption + '</h6>'+
                           
+                          '<div class="card-author">'+
+                              //'<img class="source-thumb" src="' + user.profilePictureMedium.url + '" />'+
+                              '<span class="source-name">'+ user.username +'</span><br>'+
+                              '<span class="source-service">Capture<span>'+
+                          '</div>'+
+
+                        '</div>';
+
+          } 
+
+          if(card.service == "twitter"){
+            
+                       cardHTML = ' <div class="card twitter-card" '+
+                      'data-capture-type="'+ card.service +
+                      '" data-capture-user="' + user.objectId +
+                      '" data-capture-card-id="' + card.objectId + '"> '+
+                          '<p class= "twitter-card-tweet">' + card.data +'</p>'+
                           '<div class="card-author">'+
                               '<img class="source-thumb" src="' + user.profilePictureMedium.url + '" />'+
                               '<span class="source-name">'+ user.displayName +'</span><br>'+
@@ -68,9 +88,20 @@
                           '</div>'+
 
                         '</div>';
-          }
+/*
 
+<div class="card twitter-card">
+        <p class= "twitter-card-tweet">This is a super cool tweet!! Aren't I worth a retweet? It would totes raise your klout.</p>
 
+        
+        <div class="card-author">
+            <img class="source-thumb" src="http://placekitten.com/40/40" />
+            <span class="source-name">Test Testerson</span><br>
+            <span class="source-service">twitter<span>
+        </div>
+      </div>*/
+
+          } 
 
            $("#card-col-"+ window.currentCardCol).prepend(cardHTML);
            window.currentCardCol = (window.currentCardCol < window.numCardCol)? window.currentCardCol + 1 : 1;
@@ -107,7 +138,7 @@
                 addCard(cards[key]);
               }
               catch(e){
-
+                
               }
             })
           }
@@ -127,8 +158,12 @@
                 url: parseHost + '/1/users',
                 data: params,
                 success: function(data){
+                    //make sure we got something, if not use dummy
+                    if(data.results.length == 0){
+                      data.results[0] = {'objectId':'random'};
+                    }
+
                     authors[data.results[0].objectId] = data.results[0];
-              
                 },
                 error: requestError,
               });
@@ -136,6 +171,8 @@
 
 
           var newCards = function(data){
+            //debug
+
             //go through the results and add any that are new
             $.each(data.results, function(item){
               if(!(data.results[item].objectId in cards)){
@@ -165,9 +202,8 @@
         //handler functions
         var hashChangeHandler = function(hashEvent) {
           var hash = window.location.hash.split("/");
-
-          var hashData = hash[1];
-          var hashCommand = hash[2];
+          var hashData = hash[2];
+          var hashCommand = hash[1];
 
           switch(hashCommand.trim()){
             case "event":
@@ -192,9 +228,9 @@
 
         //view functions
         var eventView = function(event){
-          window.location.hash = "#event/" + event;
+          window.location.hash = "#/event/" + event;
           $('#app-container').load('pages/cards.html');
-          cards = {};
+         // cards = {};
           activeEvent = event;
           emptyColumns();
           currentView = "event";
@@ -270,7 +306,6 @@
 
         //setup our polling
         (function poll(){
-
               var params = {
                             'where':{ 'event':
                               { '__type':'Pointer',
