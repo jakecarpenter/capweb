@@ -130,7 +130,7 @@
             var exp = /@([A-Za-z0-9_]{1,15})/g;
             var links = text.replace(exp,"@<a href='http://www.twitter.com/$1'>$1</a>"); 
             //now hashtags
-            exp = /#([A-Za-z0-9_]{1,15})/g;
+            exp = /#([A-Za-z0-9_]{1,30})/g;
             return links.replace(exp,"#<a href='http://www.twitter.com/search?q=%23$1'>$1</a>"); 
         }
 
