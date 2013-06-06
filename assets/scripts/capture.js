@@ -71,7 +71,7 @@
                           '<div class="card-author">'+
                               '<img class="source-thumb" src="assets/img/capture-icon.png" />'+
                               '<span class="source-name">'+ user.username +'</span><br>'+
-                              '<span class="source-service">'+ card.service +'<span>'+
+                              '<span class="source-service">'+ $.timeago(card.updatedAt) +'<span>'+
                           '</div>'+
 
                         '</div>';
@@ -87,7 +87,7 @@
                           '<div class="card-author">'+
                               '<img class="source-thumb" src="assets/img/twitter-icon.png" />'+
                               '<span class="source-name">'+ user.username +'</span><br>'+
-                              '<span class="source-service">'+ card.service +'<span>'+
+                              '<span class="source-service">'+ $.timeago(card.serviceTime['iso']) +'<span>'+
                           '</div>'+
 
                         '</div>';
@@ -104,7 +104,7 @@
                           '<div class="card-author">'+
                               '<img class="source-thumb" src="assets/img/facebook-icon.png" />'+
                               '<span class="source-name">'+ user.username +'</span><br>'+
-                              '<span class="source-service">'+ card.service +'<span>'+
+                              '<span class="source-service">'+ $.timeago(card.serviceTime['iso']) +'<span>'+
                           '</div>'+
 
                         '</div>';
