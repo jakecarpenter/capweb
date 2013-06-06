@@ -82,7 +82,7 @@
                       'data-capture-type="'+ card.service +
                       '" data-capture-user="' + user.objectId +
                       '" data-capture-card-id="' + card.objectId + '"> '+
-                          '<p class="twitter-card-tweet">' + card.data +'</p>'+
+                          '<p class="twitter-card-tweet">' + twitterLinks(replaceURLWithHTMLLinks(card.data)) +'</p>'+
 
                           '<div class="card-author">'+
                               '<img class="source-thumb" src="assets/img/twitter-icon.png" />'+
@@ -99,7 +99,7 @@
                       'data-capture-type="'+ card.service +
                       '" data-capture-user="' + user.objectId +
                       '" data-capture-card-id="' + card.objectId + '"> '+
-                          '<p class="facebook-card-status">' + card.data +'</p>'+
+                          '<p class="facebook-card-status">' + replaceURLWithHTMLLinks(card.data) +'</p>'+
 
                           '<div class="card-author">'+
                               '<img class="source-thumb" src="assets/img/facebook-icon.png" />'+
@@ -119,6 +119,20 @@
           
         };
 
+        //text processing.
+        var replaceURLWithHTMLLinks =function(text) {
+            var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/i;
+            return text.replace(exp,"<a href='$1'>$1</a>"); 
+        }
+
+        var twitterLinks =function(text) {
+            //first usernames
+            var exp = /@([A-Za-z0-9_]{1,15})/g;
+            var links = text.replace(exp,"@<a href='http://www.twitter.com/$1'>$1</a>"); 
+            //now hashtags
+            exp = /#([A-Za-z0-9_]{1,15})/g;
+            return links.replace(exp,"#<a href='http://www.twitter.com/search?q=%23$1'>$1</a>"); 
+        }
 
         var emptyColumns = function(){
           $.each($('[id^=card-col-]'), function(item, el){  
