@@ -57,7 +57,8 @@
           var cardHTML = '<div class="card">card error '+ card.objectId+'</div>';
           //find the type of card
           if(card.service == "capture"){
-                       cardHTML = ' <div class="card image-card" '+
+                       cardHTML = 
+                       ' <div class="card image-card" '+
                       'data-capture-type="'+ card.service +
                       '" data-capture-user="' + user.objectId +
                       '" data-capture-card-id="' + card.objectId + '"> '+
@@ -65,43 +66,50 @@
                           //'<h6>' + card.caption + '</h6>'+
                           
                           '<div class="card-author">'+
-                              //'<img class="source-thumb" src="' + user.profilePictureMedium.url + '" />'+
+                              '<img class="source-thumb" src="assets/img/capture-icon.png" />'+
                               '<span class="source-name">'+ user.username +'</span><br>'+
-                              '<span class="source-service">Capture<span>'+
+                              '<span class="source-service">'+ card.service +'<span>'+
                           '</div>'+
 
                         '</div>';
 
-          } 
-
-          if(card.service == "twitter"){
-            
-                       cardHTML = ' <div class="card twitter-card" '+
+          } else if (card.service == "twitter"){
+                       cardHTML = 
+                       ' <div class="card twitter-card" '+
                       'data-capture-type="'+ card.service +
                       '" data-capture-user="' + user.objectId +
                       '" data-capture-card-id="' + card.objectId + '"> '+
-                          '<p class= "twitter-card-tweet">' + card.data +'</p>'+
+                          '<p class="twitter-card-tweet">' + card.data +'</p>'+
+
                           '<div class="card-author">'+
-                              '<img class="source-thumb" src="' + user.profilePictureMedium.url + '" />'+
-                              '<span class="source-name">'+ user.displayName +'</span><br>'+
-                              '<span class="source-service">Capture<span>'+
+                              '<img class="source-thumb" src="assets/img/twitter-icon.png" />'+
+                              '<span class="source-name">'+ user.username +'</span><br>'+
+                              '<span class="source-service">'+ card.service +'<span>'+
                           '</div>'+
 
                         '</div>';
-/*
 
-<div class="card twitter-card">
-        <p class= "twitter-card-tweet">This is a super cool tweet!! Aren't I worth a retweet? It would totes raise your klout.</p>
 
-        
-        <div class="card-author">
-            <img class="source-thumb" src="http://placekitten.com/40/40" />
-            <span class="source-name">Test Testerson</span><br>
-            <span class="source-service">twitter<span>
-        </div>
-      </div>*/
+          }  else if (card.service == "facebook"){
+                       cardHTML = 
+                       ' <div class="card facebook-card" '+
+                      'data-capture-type="'+ card.service +
+                      '" data-capture-user="' + user.objectId +
+                      '" data-capture-card-id="' + card.objectId + '"> '+
+                          '<p class="facebook-card-status">' + card.data +'</p>'+
+
+                          '<div class="card-author">'+
+                              '<img class="source-thumb" src="assets/img/facebook-icon.png" />'+
+                              '<span class="source-name">'+ user.username +'</span><br>'+
+                              '<span class="source-service">'+ card.service +'<span>'+
+                          '</div>'+
+
+                        '</div>';
+
 
           } 
+
+          
 
            $("#card-col-"+ window.currentCardCol).prepend(cardHTML);
            window.currentCardCol = (window.currentCardCol < window.numCardCol)? window.currentCardCol + 1 : 1;
@@ -306,6 +314,9 @@
 
         //setup our polling
         (function poll(){
+
+          console.log(activeEvent);
+
               var params = {
                             'where':{ 'event':
                               { '__type':'Pointer',
