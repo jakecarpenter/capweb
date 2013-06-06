@@ -201,7 +201,7 @@
          <span class="icon-bar"></span>
          <span class="icon-bar"></span>
        </a>
-       <a class=" brand" href="../">CAPTURE</a>
+       <a class=" brand" href="../">Try<strong>Capture</strong></a>
        <div class="nav-collapse collapse" id="main-menu">
         <ul class="nav" id="main-menu-left">
           <li><form class="navbar-search pull-left" action="">
@@ -214,7 +214,7 @@
             <ul class="dropdown-menu" id="events-menu">
             </ul>
           </li>
-
+          <li><a id="logout-link" href="#">Sign Out</a></li>
         </ul>
        </div>
      </div>
@@ -270,13 +270,15 @@
           $(value).html("");
         });
 
-
+        if($.cookie("capture-session") != undefined){
+        }
+          
 
      });
     </script>
 
     <script> //<!-- facebook stuff -->
-    /* Additional JS functions here
+    // Additional JS functions here
     window.fbAsyncInit = function() {
       FB.init({
         appId      : '519438568120137', // App ID
@@ -297,7 +299,7 @@
        js = d.createElement('script'); js.id = id; js.async = true;
        js.src = "//connect.facebook.net/en_US/all.js";
        ref.parentNode.insertBefore(js, ref);
-     }(document)); */
+     }(document)); //
   </script>
 
   </body>

@@ -4,7 +4,7 @@
       var capture = (function(){
 
         //what are we looking at?
-        var activeEvent;
+        var activeEvent = 'z8uSenxePt';
 
         //the events 
         var events = [];
@@ -29,6 +29,9 @@
 
         //number of card columns
         var numCardCol = 3;
+
+        //logged in/
+        var loggedIn = $.cookie('capture-session');
 
         window.numCardCol = numCardCol;
         window.currentCardCol = 1;
@@ -204,12 +207,22 @@
             el.preventDefault();
           });
 
+          $(document).on('click', "#logout-link", function(el) {
+            doLogout();
+            el.preventDefault();
+          });
+
         //setup a handler for url hashtag changes
         $(window).on( "hashchange", hashChangeHandler);
 
         //handler functions
         var hashChangeHandler = function(hashEvent) {
-          var hash = window.location.hash.split("/");
+          var hashFull = window.location.hash ;
+          //only for madison
+          hashFull = (hashFull != "")? hashFull : "#/event/z8uSenxePt";
+          //end only for madison
+          console.log(hashFull);
+          var hash = hashFull.split("/");
           var hashData = hash[2];
           var hashCommand = hash[1];
 
@@ -228,8 +241,8 @@
               loginView(hashData);
               break;
             default:
-              console.log(hashData);
-              welcomeView(hashData);
+              eventView(hashData);
+
               break;
           }
         };
@@ -253,6 +266,7 @@
         var loginView = function(){
           //current view 
           currentView = "login";
+          $("#logout-link").hide();
 
           $('#app-container').load('pages/login.html');
         };
@@ -305,24 +319,38 @@
                 success: function(data){
                   console.log(data);
                   $.cookie('capture-user', data.objectId);
+                  $.cookie('capture-username', data.username);
                   $.cookie('capture-session', data.sessionToken);
 
+                  loggedIn = true;
+                  location.reload();
+                  $("#logout-link").show();
                 },
                 error: requestError,
               });
+        };
+        
+        var doLogout = function(){
+          $.removeCookie('capture-user');
+          $.removeCookie('capture-username');
+          $.removeCookie('capture-session');
+          
+          loggedIn = false;
+
+          location.reload();
         };
 
         //setup our polling
         (function poll(){
 
-          console.log(activeEvent);
+          if(loggedIn){
 
               var params = {
                             'where':{ 'event':
                               { '__type':'Pointer',
                               'className':'Event',
                               'objectId':  activeEvent
-                            }}, "order":"-createdAt"
+                            }}, "order":"createdAt"
                           };
 
              $.ajax({
@@ -337,6 +365,11 @@
                 }, 
                 
               });
+          }
+          else{
+            loginView();
+          }
+
 
         })();  
 
