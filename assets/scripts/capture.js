@@ -71,7 +71,7 @@
                           '<div class="card-author">'+
                               '<img class="source-thumb" src="assets/img/capture-icon.png" />'+
                               '<span class="source-name">'+ user.username +'</span><br>'+
-                              '<p class="source-service">'+ $.timeago(card.updatedAt) +'<p>'+
+                              '<p class="source-service text-right">'+ $.timeago(card.updatedAt) +'<p>'+
                           '</div>'+
 
                         '</div>';
